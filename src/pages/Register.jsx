@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaLock, FaEnvelope, FaUser, FaUserPlus } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 
 export default function Register() {
   const [username, setUsername] = useState('');
@@ -38,14 +39,21 @@ export default function Register() {
       setIsSubmitting(true);
       clearError();
       
-      // Let the AuthContext handle the API call through our new service
-      await register(username, email, password);
+      // For debugging, log request details (remove in production)
+      console.log('Attempting to register with:', { username, email });
+      
+      const response = await axios.post('/api/auth/register', {
+        username,
+        email, 
+        password
+      });
       
       // Successfully registered
       navigate('/');
     } catch (err) {
-      const errorMessage = err.message || 'Registration failed. Please try again.';
-      console.error('Registration error:', errorMessage);
+      // Improved error handling
+      const errorMessage = err.response?.data?.message || 'Registration failed. Please try again.';
+      console.error('Registration error:', err.response?.data || err);
       setFormError(errorMessage);
       setIsSubmitting(false);
     }

@@ -11,20 +11,6 @@ export default defineConfig({
     }
   },
   // Ensure assets like images are properly processed
-  assetsInclude: ['**/*.jpg', '**/*.png', '**/*.svg'],
-  // Configure proxy for API requests to use Railway backend
-  server: {
-    proxy: {
-      '/api': {
-        target: 'https://samihbassam-tutam9-backend.railway.app',
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path
-      }
-    }
-  },
-  // Define environment variables for use in the application
-  define: {
-    'process.env.VITE_API_URL': JSON.stringify('https://samihbassam-tutam9-backend.railway.app')
-  }
+  assetsInclude: ['**/*.jpg', '**/*.png', '**/*.svg']
+  // Removed proxy configuration since we're using the deployed backend
 })

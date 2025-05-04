@@ -1,47 +1,37 @@
 import axios from 'axios';
 
-// Always use the Railway backend URL
-const baseURL = 'https://samihbassam-tutam9-backend.railway.app';
-
-// Create axios instance with configuration
+// Create an axios instance with the Vercel backend URL
 const api = axios.create({
-  baseURL,
+  baseURL: 'https://samihbassam-tutam9backend.vercel.app',
   headers: {
-    'Content-Type': 'application/json',
-  },
-  // Ensure credentials are included for cross-origin requests if needed
-  withCredentials: false,
+    'Content-Type': 'application/json'
+  }
 });
 
-// Add request interceptor for authentication
+// Add authentication headers to requests
 api.interceptors.request.use(
   (config) => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
-      if (user?.token) {
+    const userInfo = localStorage.getItem('user');
+    if (userInfo) {
+      const user = JSON.parse(userInfo);
+      if (user && user.token) {
         config.headers.Authorization = `Bearer ${user.token}`;
       }
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Add response interceptor for debugging connection issues
+// Add response interceptor for better error handling
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
-    console.error('API Error:', error.message);
+    // Log friendly error messages for debugging
     if (error.response) {
-      console.error('Response status:', error.response.status);
-      console.error('Response data:', error.response.data);
+      console.error('API Error:', error.response.status, error.response.data);
     } else if (error.request) {
-      console.error('No response received. Network issue or CORS problem.');
+      console.error('Network Error:', error.message);
     }
     return Promise.reject(error);
   }

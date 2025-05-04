@@ -19,11 +19,20 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
+  // Configure axios with token
+  useEffect(() => {
+    if (user && user.token) {
+      api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
+    } else {
+      delete api.defaults.headers.common['Authorization'];
+    }
+  }, [user]);
+
   // Register user
   const register = async (username, email, password) => {
     try {
       setLoading(true);
-      clearError(); // Clear any previous errors
+      clearError();
       
       const response = await api.post('/api/auth/register', {
         username,

@@ -23,10 +23,12 @@ export default function AddTodo() {
 
     setIsSubmitting(true);
     try {
-      await api.post('/api/todos', { 
-        title,
-        dueDate: dueDate || null
-      });
+      await api.post('/api/todos', 
+        { 
+          title,
+          dueDate: dueDate || null
+        }
+      );
       navigate('/');
     } catch (err) {
       setError('Failed to add task. Please try again.');
