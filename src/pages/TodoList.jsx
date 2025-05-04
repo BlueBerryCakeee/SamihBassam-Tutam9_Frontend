@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaSpinner, FaClipboardList } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/apiConfig';
+import { Link } from 'react-router-dom'; // Add this import
 
 export default function TodoList() {
   const [todos, setTodos] = useState([]);
@@ -96,9 +97,10 @@ export default function TodoList() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <a href="/add" className="bg-blue-400 text-white px-6 py-2 rounded-md hover:bg-blue-500 inline-block">
+                {/* Replace <a> with <Link> component */}
+                <Link to="/add" className="bg-blue-400 text-white px-6 py-2 rounded-md hover:bg-blue-500 inline-block">
                   Add Your First Task
-                </a>
+                </Link>
               </motion.div>
             </div>
           ) : (
