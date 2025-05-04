@@ -32,7 +32,9 @@ export const AuthProvider = ({ children }) => {
   const register = async (username, email, password) => {
     try {
       setLoading(true);
-      clearError();
+      clearError(); // Clear any previous errors
+      
+      console.log('Registering with API endpoint:', `${api.defaults.baseURL}/api/auth/register`);
       
       const response = await api.post('/api/auth/register', {
         username,
@@ -40,13 +42,26 @@ export const AuthProvider = ({ children }) => {
         password
       });
       
+      console.log('Registration successful:', response.data);
+      
       setUser(response.data);
       localStorage.setItem('user', JSON.stringify(response.data));
       setLoading(false);
       return response.data;
     } catch (err) {
       setLoading(false);
-      const errorMsg = err.response?.data?.message || 'Registration failed';
+      
+      // Enhanced error handling
+      let errorMsg = 'Registration failed';
+      
+      if (err.response && err.response.data) {
+        errorMsg = err.response.data.message || errorMsg;
+        console.error('Server error details:', err.response.data);
+      } else if (err.request) {
+        errorMsg = 'Network error. Please check your connection.';
+        console.error('Network error:', err.request);
+      }
+      
       setError(errorMsg);
       console.error('Registration error:', errorMsg);
       throw new Error(errorMsg);

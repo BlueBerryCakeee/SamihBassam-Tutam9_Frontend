@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaLock, FaEnvelope, FaUser, FaUserPlus } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import api from '../services/apiConfig';
 
 export default function Register() {
   const [username, setUsername] = useState('');
@@ -18,6 +18,10 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Clear previous errors
+    setFormError('');
+    clearError();
     
     // Basic validation
     if (!username || !email || !password || !confirmPassword) {
@@ -37,24 +41,41 @@ export default function Register() {
 
     try {
       setIsSubmitting(true);
-      clearError();
       
-      // For debugging, log request details (remove in production)
+      // Log for debugging
       console.log('Attempting to register with:', { username, email });
       
-      const response = await axios.post('/api/auth/register', {
+      // Make direct API call instead of using context to get more error details
+      const response = await api.post('/api/auth/register', {
         username,
         email, 
         password
       });
       
-      // Successfully registered
-      navigate('/');
+      // If successful, update auth context with user data
+      if (response.data) {
+        localStorage.setItem('user', JSON.stringify(response.data));
+        // Successfully registered
+        navigate('/');
+      }
     } catch (err) {
-      // Improved error handling
-      const errorMessage = err.response?.data?.message || 'Registration failed. Please try again.';
-      console.error('Registration error:', err.response?.data || err);
-      setFormError(errorMessage);
+      // Enhanced error handling
+      console.error('Registration error:', err);
+      
+      if (err.response) {
+        // Get detailed error message from the server
+        const errorMessage = err.response.data.message || 'Registration failed. Please try again.';
+        setFormError(errorMessage);
+        console.error('Server error details:', err.response.data);
+      } else if (err.request) {
+        // Network error
+        setFormError('Network error. Please check your connection to the server.');
+        console.error('Network error:', err.request);
+      } else {
+        // Something else happened
+        setFormError('Registration failed. Please try again.');
+      }
+    } finally {
       setIsSubmitting(false);
     }
   };
